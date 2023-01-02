@@ -1,13 +1,29 @@
+const db = require('../database/db');
+
 class UserController {
-    async createUser(req, res) {}
+  async createUser(req, res) {
+    const { name, email, password } = req.body;
 
-    async getUsers(req, res) {}
+    try {
+        const newUser = await db.query(`INSERT INTO user_t(name, email, password) VALUES($1, $2, $3) RETURNING *;`, [name, email, password]);
 
-    async getUserById(req, res) {}
+        console.log('newUser', newUser);
 
-    async updateUser(req, res) {}
+        res.json(newUser);
+    } catch (error) {
+        console.log('--error--', error);
+    }
+  }
 
-    async deleteUser(req, res) {}
+  async getUsers(req, res) {
+      res.send('respond with a resource');
+  }
+
+  async getUserById(req, res) {}
+
+  async updateUser(req, res) {}
+
+  async deleteUser(req, res) {}
 }
 
-export default new UserController();
+module.exports = new UserController();
