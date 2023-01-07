@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const constroller = require('../controllers/users');
+const controller = require('../controllers/users');
 const encrypt = require('../utils/encrypt');
 
 /* GET users listing. */
 router.get('/users', async (req, res, next) => {
-  const users = await constroller.getUsers();
+  const users = await controller.getUsers();
 
   res.json(users);
 });
@@ -13,7 +13,7 @@ router.get('/users', async (req, res, next) => {
 /* GET user. */
 router.get('/users/:id', async (req, res, next) => {
   const id = req.params.id;
-  const user = await constroller.getUserById(id);
+  const user = await controller.getUserById(id);
 
   res.json(user);
 });
@@ -22,7 +22,7 @@ router.get('/users/:id', async (req, res, next) => {
 router.post('/users', async (req, res, next) => {
   const { name, email, password } = req.body;
   const encryptedPassword = await encrypt.cryptPassword(password);
-  const createdUsers = await constroller.createUser({ name, email, password: encryptedPassword });
+  const createdUsers = await controller.createUser({ name, email, password: encryptedPassword });
 
   res.json(createdUsers);
 });
@@ -30,7 +30,7 @@ router.post('/users', async (req, res, next) => {
 /* PATCH user. */
 router.put('/users', async (req, res, next) => {
   const { name, email, id } = req.body;
-  const updatedUser = await constroller.updateUser({ name, email, id });
+  const updatedUser = await controller.updateUser({ name, email, id });
 
   res.json(updatedUser);
 });
@@ -45,7 +45,7 @@ router.patch('/users/:id', function(req, res, next) {
 /* DELETE user. */
 router.delete('/users/:id', async (req, res, next) => {
   const id = req.params.id;
-  const result = await constroller.deleteUser(id);
+  const result = await controller.deleteUser(id);
 
   if (result.rowCount > 0) {
     res.send('User successfully deleted!');
