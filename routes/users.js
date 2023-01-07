@@ -36,7 +36,7 @@ router.put('/users', async (req, res, next) => {
 });
 
 // TODO: add patch for user,
-// TODO: change (patching) passowrd
+// TODO: change (patching) password
 /* PATCH user. */
 router.patch('/users/:id', function(req, res, next) {
   res.send('respond with a resource');
