@@ -31,9 +31,23 @@ class UserController {
     }
   }
 
-  async updateUser(req, res) {}
+  async updateUser({ name, email, id }) {
+    try {
+      const updatedUser = await db.query(`UPDATE user_t set name = $1, email = $2 WHERE id = $3;`, [name, email, id]);
 
-  async deleteUser(req, res) {}
+      return updatedUser.rows[0];
+    } catch(error) {
+      console.log('--error--', error);
+    }
+  }
+
+  async deleteUser(id) {
+    try {
+      return await db.query(`DELETE FROM user_t WHERE id = $1;`, [id]);
+    } catch(error) {
+      console.log('--error--', error);
+    }
+  }
 }
 
 module.exports = new UserController();
