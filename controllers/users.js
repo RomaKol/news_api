@@ -7,7 +7,7 @@ class UserController {
 
       return createdUsers.rows[0];
     } catch (error) {
-        console.log('--error--', error);
+        console.log('--error--createUser--', error);
     }
   }
 
@@ -17,7 +17,7 @@ class UserController {
 
       return users.rows;
     } catch (error) {
-      console.log('--error--', error);
+      console.log('--error--getUsers--', error);
     }
   }
 
@@ -27,7 +27,7 @@ class UserController {
 
       return user.rows[0];
     } catch(error) {
-      console.log('--error--', error);
+      console.log('--error--getUserById--', error);
     }
   }
 
@@ -37,7 +37,39 @@ class UserController {
 
       return updatedUser.rows[0];
     } catch(error) {
-      console.log('--error--', error);
+      console.log('--error--updateUser--', error);
+    }
+  }
+
+  // TODO: refactor
+  async updateUser2({ name, email, id }) {
+    try {
+      // Start a client transaction to update the user data
+      const client = await db.connect();
+      
+      try {
+        await client.query('BEGIN');
+
+        const { rows } = await client.query(`UPDATE user_t set name = $1, email = $2 WHERE id = $3;`, [name, email, id]);
+        const updatedUser = rows[0];
+
+        // Commit the transaction and release the client connection
+        await client.query('COMMIT');
+        client.release();
+        
+        // Return the updated user object as a JSON response
+        return updatedUser;
+      } catch(error) {
+        console.log('--error--updateUser2--', error);
+        // Roll back the transaction and release the client connection in case of error
+        await client.query('ROLLBACK');
+        client.release();
+        throw error;
+      }
+
+    } catch (err) {
+      console.error('==error--updateUser2==', err);
+      // res.status(500).send('Internal server error');
     }
   }
 
@@ -45,7 +77,7 @@ class UserController {
     try {
       return await db.query(`DELETE FROM user_t WHERE id = $1;`, [id]);
     } catch(error) {
-      console.log('--error--', error);
+      console.log('--error--deleteUser--', error);
     }
   }
 }
