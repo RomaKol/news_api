@@ -4,18 +4,22 @@ const controller = require('../controllers/users');
 const authenticateToken = require('../middlewares/authenticateToken');
 
 /* GET users listing. */
-router.get('/users', async (req, res, next) => {
+router.get('/users', authenticateToken, async (req, res, next) => {
   const users = await controller.getUsers();
 
   res.status(201).json(users);
 });
 
 /* GET user. */
-router.get('/users/:id', async (req, res, next) => {
+router.get('/users/:id', authenticateToken, async (req, res, next) => {
   const id = req.params.id;
   const user = await controller.getUserById(id);
 
-  res.status(201).json(user);
+  if (user) {
+    res.status(201).json(user);
+  }
+
+  res.status(404).send('User not found!');
 });
 
 /* POST user create. */
@@ -31,29 +35,45 @@ router.get('/users/:id', async (req, res, next) => {
 /* PUT user. */
 router.put('/users/:id', authenticateToken, async (req, res, next) => {
   const { name, email } = req.body;
-  const id = req.params.id;
-  const updatedUser = await controller.updateUser({ name, email, id });
+  const id = parseInt(req.params.id);
 
-  res.status(201).json(updatedUser);
+  if (req.userId === id) {
+    const numberUpdatedUsers = await controller.updateUser({ name, email, id });
+
+    if (numberUpdatedUsers > 0) {
+      const user = await controller.getUserById(id);
+      res.status(201).json(user);
+    } else {
+      res.status(500).send('Internal server error');
+    }
+    
+  } else {
+    res.status(500).send('You don\'t have permissions to change this user!');
+  }
 });
 
 // TODO: change (patching) password
 /* PATCH user. */
 router.patch('/users/:id', authenticateToken, async (req, res, next) => {
   const { name, email } = req.body;
-  const id = req.params.id;
-  const updatedUser = await controller.updateUser2({ name, email, id });
+  const id = parseInt(req.params.id);
+  if (req.userId === id) {
+    const updatedUser = await controller.updateUser2({ name, email, id });
 
-  if (updatedUser) {
-    res.status(201).json(updatedUser);
+    if (updatedUser) {
+      res.status(201).json(updatedUser);
+    } else {
+      res.status(500).send('Internal server error');
+    }
+    
   } else {
-    res.status(500).send('Internal server error');
+    res.status(500).send('You don\'t have permissions to change this user!');
   }
 });
 
 /* DELETE user. */
 router.delete('/users/:id', authenticateToken, async (req, res, next) => {
-  const id = req.params.id;
+  const id = parseInt(req.params.id);
   if (req.userId === id) {
     const result = await controller.deleteUser(id);
 
@@ -68,6 +88,5 @@ router.delete('/users/:id', authenticateToken, async (req, res, next) => {
   }
   
 });
-// TODO: add error for bad request
 
 module.exports = router;

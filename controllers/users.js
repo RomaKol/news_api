@@ -31,47 +31,57 @@ class UserController {
     }
   }
 
+  async getUserByEmail(email) {
+    try {
+      const user = await db.query(`SELECT id, name, email, password FROM user_t WHERE email = $1;`, [email]);
+
+      return user.rows[0];
+    } catch(error) {
+      console.log('--error--getUserByEmail--', error);
+    }
+  }
+
   async updateUser({ name, email, id }) {
     try {
       const updatedUser = await db.query(`UPDATE user_t set name = $1, email = $2 WHERE id = $3;`, [name, email, id]);
 
-      return updatedUser.rows[0];
+      return updatedUser.rowCount;
     } catch(error) {
       console.log('--error--updateUser--', error);
     }
   }
 
   // TODO: refactor
-  async updateUser2({ name, email, id }) {
-    try {
-      // Start a client transaction to update the user data
-      const client = await db.connect();
+  // async updateUser2({ name, email, id }) {
+  //   try {
+  //     // Start a client transaction to update the user data
+  //     const client = await db.connect();
       
-      try {
-        await client.query('BEGIN');
+  //     try {
+  //       await client.query('BEGIN');
 
-        const { rows } = await client.query(`UPDATE user_t set name = $1, email = $2 WHERE id = $3;`, [name, email, id]);
-        const updatedUser = rows[0];
+  //       const queryResult = await client.query(`UPDATE user_t set name = $1, email = $2 WHERE id = $3;`, [name, email, id]);
+  //       console.log('--queryResult--', queryResult);
+  //       const updatedUser = queryResult.rows[0];
 
-        // Commit the transaction and release the client connection
-        await client.query('COMMIT');
-        client.release();
+  //       // Commit the transaction and release the client connection
+  //       await client.query('COMMIT');
+  //       client.release();
         
-        // Return the updated user object as a JSON response
-        return updatedUser;
-      } catch(error) {
-        console.log('--error--updateUser2--', error);
-        // Roll back the transaction and release the client connection in case of error
-        await client.query('ROLLBACK');
-        client.release();
-        throw error;
-      }
+  //       // Return the updated user object as a JSON response
+  //       return updatedUser;
+  //     } catch(error) {
+  //       console.log('--error--updateUser2--', error);
+  //       // Roll back the transaction and release the client connection in case of error
+  //       await client.query('ROLLBACK');
+  //       client.release();
+  //       throw error;
+  //     }
 
-    } catch (err) {
-      console.error('==error--updateUser2==', err);
-      // res.status(500).send('Internal server error');
-    }
-  }
+  //   } catch (err) {
+  //     console.error('==error--updateUser2==', err);
+  //   }
+  // }
 
   async deleteUser(id) {
     try {
