@@ -14,19 +14,26 @@ router.post('/sign-up', async (req, res, next) => {
   }
   const encryptedPassword = await encrypt.cryptPassword(password);
   const createdUsers = await usersController.createUser({ name, email, password: encryptedPassword });
-  const token = await tokensController.createToken({ userId: createdUsers.id });
 
-  res
-    .status(201)
-    .json({
-      message: 'User registered successfully',
-      user: {
-        name: createdUsers.name,
-        email: createdUsers.email,
-        id: createdUsers.id,
-      },
-      token,
+  if (createdUsers) {
+    const token = await tokensController.createToken({userId: createdUsers.id});
+
+    res
+        .status(201)
+        .json({
+          message: 'User registered successfully',
+          user: {
+            name: createdUsers.name,
+            email: createdUsers.email,
+            id: createdUsers.id,
+          },
+          token,
+        });
+  } else {
+    res.status(500).json({
+      message: 'User with this email already exist'
     });
+  }
 });
 
 /* POST sign-up */
@@ -67,7 +74,7 @@ router.post('/sign-in', async (req, res, next) => {
 
 /* POST sign-out */
 router.get('/auth/sign-out', async (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1];
+  const token = req.header('Authorization').split(' ')[1];
   const result = await tokensController.deleteToken({ token });
   if (result.rowCount > 0) {
     res

@@ -8,6 +8,7 @@ class UserController {
       return createdUsers.rows[0];
     } catch (error) {
         console.log('--error--createUser--', error);
+        return undefined;
     }
   }
 
