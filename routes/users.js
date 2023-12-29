@@ -18,20 +18,10 @@ router.get('/users/:id', authenticateToken, async (req, res, next) => {
 
   if (user) {
     res.status(201).json(user);
+  } else {
+    res.status(404).send('User not found!');
   }
-
-  res.status(404).send('User not found!');
 });
-
-/* POST user create. */
-// Remove after auth will be finished
-// router.post('/users', async (req, res, next) => {
-//   const { name, email, password } = req.body;
-//   const encryptedPassword = await encrypt.cryptPassword(password);
-//   const createdUsers = await controller.createUser({ name, email, password: encryptedPassword });
-
-//   res.json(createdUsers);
-// });
 
 /* PUT user. */
 router.put('/users/:id', authenticateToken, async (req, res, next) => {
@@ -58,13 +48,11 @@ router.patch('/users/:id', authenticateToken, async (req, res, next) => {
   const { name, email, password } = req.body;
   const id = parseInt(req.params.id);
   const changedParams = { id, name, email };
-  console.log('--password--', password);
 
   if (password) {
     const encryptedPassword = await encrypt.cryptPassword(password);
     changedParams.password = encryptedPassword;
   };
-  console.log('--changedParams--', changedParams);
 
   if (req.userId === id) {
     const updatedUser = await controller.updateUser2(changedParams);

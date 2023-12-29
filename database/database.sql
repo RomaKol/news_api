@@ -14,3 +14,16 @@ create TABLE tokens_t(
 	  REFERENCES user_t(id)
 	  ON DELETE CASCADE
 );
+
+create TABLE articles_t(
+    id SERIAL PRIMARY KEY,
+    user_id INT,
+    date timestamptz NOT NULL DEFAULT NOW(),
+    title VARCHAR(255) NOT NULL,
+    content JSON,
+    image BYTEA,
+    CONSTRAINT fk_user
+      FOREIGN KEY(user_id)
+	  REFERENCES user_t(id)
+	  ON DELETE CASCADE
+);

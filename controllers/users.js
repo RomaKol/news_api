@@ -29,6 +29,7 @@ class UserController {
       return user.rows[0];
     } catch(error) {
       console.log('--error--getUserById--', error);
+      return undefined;
     }
   }
 
@@ -39,6 +40,7 @@ class UserController {
       return user.rows[0];
     } catch(error) {
       console.log('--error--getUserByEmail--', error);
+      throw error;
     }
   }
 
@@ -49,11 +51,11 @@ class UserController {
       return updatedUser.rowCount;
     } catch(error) {
       console.log('--error--updateUser--', error);
+      return 0;
     }
   }
 
   async updateUser2({ id, name, email, password }) {
-    console.log('--passowrd--', password);
     try {
       const queryResult = await db.query(
         `UPDATE user_t SET name = COALESCE($2, name), email = COALESCE($3, email), password = COALESCE($4, password) WHERE id = $1 RETURNING *`,
@@ -64,41 +66,9 @@ class UserController {
       return updatedUser;
     } catch(error) {
       console.log('--error--updateUser2--', error);
-      throw error;
+      return undefined;
     }
   }
-
-  // TODO: refactor
-  // async updateUser2({ name, email, id }) {
-  //   try {
-  //     // Start a client transaction to update the user data
-  //     const client = await db.connect();
-      
-  //     try {
-  //       await client.query('BEGIN');
-
-  //       const queryResult = await client.query(`UPDATE user_t set name = $1, email = $2 WHERE id = $3;`, [name, email, id]);
-  //       console.log('--queryResult--', queryResult);
-  //       const updatedUser = queryResult.rows[0];
-
-  //       // Commit the transaction and release the client connection
-  //       await client.query('COMMIT');
-  //       client.release();
-        
-  //       // Return the updated user object as a JSON response
-  //       return updatedUser;
-  //     } catch(error) {
-  //       console.log('--error--updateUser2--', error);
-  //       // Roll back the transaction and release the client connection in case of error
-  //       await client.query('ROLLBACK');
-  //       client.release();
-  //       throw error;
-  //     }
-
-  //   } catch (err) {
-  //     console.error('==error--updateUser2==', err);
-  //   }
-  // }
 
   async deleteUser(id) {
     try {
