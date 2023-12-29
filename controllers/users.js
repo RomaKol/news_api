@@ -51,6 +51,22 @@ class UserController {
     }
   }
 
+  async updateUser2({ id, name, email, password }) {
+    console.log('--passowrd--', password);
+    try {
+      const queryResult = await db.query(
+        `UPDATE user_t SET name = COALESCE($2, name), email = COALESCE($3, email), password = COALESCE($4, password) WHERE id = $1 RETURNING *`,
+        [id, name, email, password]
+      );
+      const updatedUser = queryResult.rows[0];
+
+      return updatedUser;
+    } catch(error) {
+      console.log('--error--updateUser2--', error);
+      throw error;
+    }
+  }
+
   // TODO: refactor
   // async updateUser2({ name, email, id }) {
   //   try {

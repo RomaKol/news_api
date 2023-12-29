@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/users');
 const authenticateToken = require('../middlewares/authenticateToken');
+const encrypt = require('../utils/encrypt');
 
 /* GET users listing. */
 router.get('/users', authenticateToken, async (req, res, next) => {
@@ -52,16 +53,25 @@ router.put('/users/:id', authenticateToken, async (req, res, next) => {
   }
 });
 
-// TODO: change (patching) password
 /* PATCH user. */
 router.patch('/users/:id', authenticateToken, async (req, res, next) => {
-  const { name, email } = req.body;
+  const { name, email, password } = req.body;
   const id = parseInt(req.params.id);
+  const changedParams = { id, name, email };
+  console.log('--password--', password);
+
+  if (password) {
+    const encryptedPassword = await encrypt.cryptPassword(password);
+    changedParams.password = encryptedPassword;
+  };
+  console.log('--changedParams--', changedParams);
+
   if (req.userId === id) {
-    const updatedUser = await controller.updateUser2({ name, email, id });
+    const updatedUser = await controller.updateUser2(changedParams);
 
     if (updatedUser) {
-      res.status(201).json(updatedUser);
+      const { password, ...user } = updatedUser;
+      res.status(201).json(user);
     } else {
       res.status(500).send('Internal server error');
     }
