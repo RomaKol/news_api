@@ -74,7 +74,7 @@ router.post('/sign-in', async (req, res, next) => {
 
 /* POST sign-out */
 router.get('/auth/sign-out', async (req, res, next) => {
-  const token = req.header('Authorization').split(' ')[1];
+  const token = req.header('Authorization')?.split(' ')[1];
   const result = await tokensController.deleteToken({ token });
   if (result.rowCount > 0) {
     res

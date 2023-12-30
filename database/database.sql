@@ -18,9 +18,10 @@ create TABLE tokens_t(
 create TABLE articles_t(
     id SERIAL PRIMARY KEY,
     user_id INT,
-    date timestamptz NOT NULL DEFAULT NOW(),
+    date_creation timestamptz NOT NULL DEFAULT NOW(),
     title VARCHAR(255) NOT NULL,
     content JSON,
+    description VARCHAR(255),
     image BYTEA,
     CONSTRAINT fk_user
       FOREIGN KEY(user_id)

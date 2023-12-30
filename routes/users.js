@@ -5,14 +5,14 @@ const authenticateToken = require('../middlewares/authenticateToken');
 const encrypt = require('../utils/encrypt');
 
 /* GET users listing. */
-router.get('/users', authenticateToken, async (req, res, next) => {
+router.get('/', authenticateToken, async (req, res, next) => {
   const users = await controller.getUsers();
 
   res.status(201).json(users);
 });
 
-/* GET user. */
-router.get('/users/:id', authenticateToken, async (req, res, next) => {
+/* GET user by ID. */
+router.get('/:id', authenticateToken, async (req, res, next) => {
   const id = req.params.id;
   const user = await controller.getUserById(id);
 
@@ -24,7 +24,7 @@ router.get('/users/:id', authenticateToken, async (req, res, next) => {
 });
 
 /* PUT user. */
-router.put('/users/:id', authenticateToken, async (req, res, next) => {
+router.put('/:id', authenticateToken, async (req, res, next) => {
   const { name, email } = req.body;
   const id = parseInt(req.params.id);
 
@@ -44,7 +44,7 @@ router.put('/users/:id', authenticateToken, async (req, res, next) => {
 });
 
 /* PATCH user. */
-router.patch('/users/:id', authenticateToken, async (req, res, next) => {
+router.patch('/:id', authenticateToken, async (req, res, next) => {
   const { name, email, password } = req.body;
   const id = parseInt(req.params.id);
   const changedParams = { id, name, email };
@@ -69,8 +69,8 @@ router.patch('/users/:id', authenticateToken, async (req, res, next) => {
   }
 });
 
-/* DELETE user. */
-router.delete('/users/:id', authenticateToken, async (req, res, next) => {
+/* DELETE user by ID. */
+router.delete('/:id', authenticateToken, async (req, res, next) => {
   const id = parseInt(req.params.id);
   if (req.userId === id) {
     const result = await controller.deleteUser(id);
@@ -84,7 +84,6 @@ router.delete('/users/:id', authenticateToken, async (req, res, next) => {
   } else {
     res.status(500).send('You don\'t have permissions to delete this user!');
   }
-  
 });
 
 module.exports = router;
