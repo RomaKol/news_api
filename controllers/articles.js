@@ -3,7 +3,7 @@ const db = require('../database/dbConnection');
 class ArticlesController {
   async getArticles() {
     try {
-      const articles = await db.query(`SELECT id, date_creation, title, description, image FROM articles_t;`);
+      const articles = await db.query(`SELECT id, date_creation, title, description, image_id FROM articles_t;`);
 
       return articles.rows;
     } catch (error) {
